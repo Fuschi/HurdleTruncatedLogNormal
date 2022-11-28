@@ -1,4 +1,4 @@
-Package: trunclognorm
+Package: HurdleTruncatedLogNormal
 Title: Hurdle Zero Left-Censored Log-Normal Model
 Version: 0.0.0.9000
 Authors@R: 
@@ -8,3 +8,7 @@ License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.2
+Depends:
+   R (>= 3.6.0),
+   truncnorm,
+   MASS (>= 7.0)
