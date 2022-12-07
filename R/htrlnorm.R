@@ -14,8 +14,8 @@
 #' @param phi probability of zero.
 #' @param meanlog mean in the log scale.
 #' @param sdlog standard deviation in log scale.
-#' @param a vector of lower bounds.
-#' @param b vector of upper bounds
+#' @param a lower bounds.
+#' @param b upper bounds.
 #' @param y numeric vector containing only finite values.
 #' @param warning.silent logical; if TRUE suppress all warning messages from 
 #' \code{\link{fitdistr}} during the mle process.
@@ -29,8 +29,7 @@ NULL
 #' @export
 mle.htrlnorm <- function(y, warning.silent=TRUE){
   
-  if(any(y<0)) stop("find negative values in y")
-  if(!is.vector(y)) stop("y must be a vector")
+  if(!is.vector(y) | any(y<0) | !is.numeric(y)) stop("y must be a numeric vector with all values >= 0.")
   
   y <- log(y+1)
   y1 <- y[y>0]
@@ -83,6 +82,7 @@ mle.htrlnorm <- function(y, warning.silent=TRUE){
 dhtrlnorm <- function(x, phi=0, meanlog=0, sdlog=1, a=0, b=Inf){
   
   #CHECK ARGUMENTS
+  if(!is.vector(x) | !is.numeric(x)) stop("x must be a numeric vector")
   if(!is.numeric(phi) | !is.numeric(meanlog) | !is.numeric(sdlog)) stop("phi, meanlog, sdlog must be all number")
   if(phi<0 || phi>1) stop("phi must be in range [0,1]")
   if(sd<=0) stop("sd must be greater than 0")
@@ -101,6 +101,7 @@ dhtrlnorm <- function(x, phi=0, meanlog=0, sdlog=1, a=0, b=Inf){
 qhtrlnorm <- function(p, phi=0, meanlog=0, sdlog=1, a=0, b=Inf){
   
   #CHECK ARGUMENTS
+  if(!is.vector(p) | !is.numeric(p)) stop("p must be a numeric vector")
   if(!is.numeric(phi) | !is.numeric(meanlog) | !is.numeric(sdlog)) stop("phi, meanlog, sdlog must be all number")
   if(phi<0 || phi>1) stop("phi must be in range [0,1]")
   if(sdlog<0) stop("sdlog must be greater than 0")

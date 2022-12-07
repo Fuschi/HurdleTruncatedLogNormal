@@ -31,9 +31,9 @@ rhtrlnorm(n, phi = 0, meanlog = 0, sdlog = 1, a = 0, b = Inf)
 
 \item{sdlog}{standard deviation in log scale.}
 
-\item{a}{vector of lower bounds.}
+\item{a}{lower bounds.}
 
-\item{b}{vector of upper bounds}
+\item{b}{upper bounds.}
 
 \item{p}{vector of probabilities.}
 
