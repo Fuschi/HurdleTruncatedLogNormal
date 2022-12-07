@@ -10,5 +10,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.2
 Depends:
    R (>= 3.6.0),
-   truncnorm,
+   stats (>= 3.6.0),
+   truncnorm (>= 1.0),
    MASS (>= 7.0)

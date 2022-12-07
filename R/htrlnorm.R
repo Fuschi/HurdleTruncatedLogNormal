@@ -8,11 +8,15 @@
 #' @description mle parameter estimation, random generation, density and 
 #' quantile function for the hurdle truncated log-normal distribution.
 #'
-#' @param x,q vector of quantiles.
+#' @param x vector of quantiles.
 #' @param p vector of probabilities.
 #' @param n number of observations.
+#' @param phi probability of zero.
 #' @param meanlog mean in the log scale.
-#' @param sd standard deviation in log scale.
+#' @param sdlog standard deviation in log scale.
+#' @param a vector of lower bounds.
+#' @param b vector of upper bounds
+#' @param y numeric vector containing only finite values.
 #' @param warning.silent logical; if TRUE suppress all warning messages from 
 #' \code{\link{fitdistr}} during the mle process.
 NULL
@@ -21,24 +25,25 @@ NULL
 
 #' @rdname htrlnorm
 #' @importFrom MASS fitdistr
+#' @importFrom stats sd
 #' @export
-mle.htrlnorm <- function(x, warning.silent=TRUE){
+mle.htrlnorm <- function(y, warning.silent=TRUE){
   
-  if(any(x<0)) stop("find negative values in x")
-  if(!is.vector(x)) stop("x must be a vector")
+  if(any(y<0)) stop("find negative values in y")
+  if(!is.vector(y)) stop("y must be a vector")
   
-  x <- log(x+1)
-  x1 <- x[x>0]
+  y <- log(y+1)
+  y1 <- y[y>0]
   
-  n <- length(x)
-  n1 <- length(x1)
+  n <- length(y)
+  n1 <- length(y1)
   n0 <- n - n1
   
   phi <- n0/n
   
   param.trnorm.mle <- NULL
-  try(param.trnorm.mle <- MASS::fitdistr(x=x1, densfun=truncnorm::dtruncnorm,
-                                         start=list(mean=mean(x1),sd=sd(x1)),
+  try(param.trnorm.mle <- MASS::fitdistr(x=y1, densfun=truncnorm::dtruncnorm,
+                                         start=list(mean=mean(y1),sd=stats::sd(y1)),
                                          a=0,b=Inf),
       silent=warning.silent
   )
@@ -75,15 +80,17 @@ mle.htrlnorm <- function(x, warning.silent=TRUE){
 #'@rdname htrlnorm
 #'@importFrom truncnorm dtruncnorm
 #'@export
-dhtrlnorm <- function(xi, phi=0, meanlog=0, sdlog=1){
+dhtrlnorm <- function(x, phi=0, meanlog=0, sdlog=1, a=0, b=Inf){
   
   #CHECK ARGUMENTS
   if(!is.numeric(phi) | !is.numeric(meanlog) | !is.numeric(sdlog)) stop("phi, meanlog, sdlog must be all number")
   if(phi<0 || phi>1) stop("phi must be in range [0,1]")
   if(sd<=0) stop("sd must be greater than 0")
+  if(!is.numeric(a)) stop("a must be numeric")
+  if(!is.numeric(b)) stop("b must be numeric")
   
-  ans <- (1-phi)*dtruncnorm(xi,a=0,b=Inf,mean=meanlog,sd=sdlog)
-  ans[y==0] <- phi
+  ans <- (1-phi)*dtruncnorm(x,a=a,b=b,mean=meanlog,sd=sdlog)
+  ans[ans==0] <- phi
   
   return(ans)
 }
@@ -91,18 +98,20 @@ dhtrlnorm <- function(xi, phi=0, meanlog=0, sdlog=1){
 #'@rdname htrlnorm
 #'@importFrom truncnorm qtruncnorm
 #'@export
-qhtrlnorm <- function(p, phi=0, meanlog=0, sdlog=1){
+qhtrlnorm <- function(p, phi=0, meanlog=0, sdlog=1, a=0, b=Inf){
   
   #CHECK ARGUMENTS
   if(!is.numeric(phi) | !is.numeric(meanlog) | !is.numeric(sdlog)) stop("phi, meanlog, sdlog must be all number")
   if(phi<0 || phi>1) stop("phi must be in range [0,1]")
   if(sdlog<0) stop("sdlog must be greater than 0")
+  if(!is.numeric(a)) stop("a must be numeric")
+  if(!is.numeric(b)) stop("b must be numeric")
   
   ans <- rep(NA_real_,length(p))
   ans[p<=phi] <- 0
   
   idx <- is.na(ans)
-  ans[idx]  <- qtruncnorm(p=(p[idx]-phi)/(1-phi), a=0, b=Inf,
+  ans[idx]  <- qtruncnorm(p=(p[idx]-phi)/(1-phi), a=a, b=b,
                           mean=meanlog, sd=sdlog)
   
   ans <- exp(ans) - 1
@@ -115,17 +124,19 @@ qhtrlnorm <- function(p, phi=0, meanlog=0, sdlog=1){
 #' @rdname htrlnorm
 #' @importFrom truncnorm rtruncnorm
 #' @export
-rhtrlnorm <- function(N, phi=0, meanlog=0, sdlog=1){
+rhtrlnorm <- function(n, phi=0, meanlog=0, sdlog=1, a=0, b=Inf){
   
-  if(!is.numeric(N) | !is.numeric(phi) | !is.numeric(meanlog) | !is.numeric(sdlog)) stop("N, phi, meanlog, sdlog must be all number")
-  if(round(N)!=N) stop("N must be an integer")
-  if(N<1) stop("N must be a positive integer number")
+  if(!is.numeric(n) | !is.numeric(phi) | !is.numeric(meanlog) | !is.numeric(sdlog)) stop("n, phi, meanlog, sdlog must be all number")
+  if(round(n)!=n) stop("n must be an integer")
+  if(n<1) stop("n must be a positive integer number")
   if(phi<0 || phi>1) stop("phi must be a number in [0,1]")
   if(sdlog<0) stop("sdlog must be a positive number")
+  if(!is.numeric(a)) stop("a must be numeric")
+  if(!is.numeric(b)) stop("b must be numeric")
   
-  ans <- stats::rbinom(n=N, size=1, prob=1-phi)
+  ans <- stats::rbinom(n=n, size=1, prob=1-phi)
   m <- length(ans[ans>0])
-  ans[ans==1] <- truncnorm::rtruncnorm(n=m, a=0, b=Inf,
+  ans[ans==1] <- truncnorm::rtruncnorm(n=m, a=a, b=b,
                                        mean=meanlog,sd=sdlog)
   
   ans <- exp(ans) - 1

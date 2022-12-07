@@ -2,34 +2,42 @@
 % Please edit documentation in R/htrlnorm.R
 \name{htrlnorm}
 \alias{htrlnorm}
-\alias{mle.htrlnorm,dhtrlnorm}
+\alias{mle.htrlnorm,dhtrlnorm,phtrlnorm,qhtrlnorm}
 \alias{mle.htrlnorm}
 \alias{dhtrlnorm}
 \alias{qhtrlnorm}
 \alias{rhtrlnorm}
 \title{Hurdle Truncated Log-Normal Model}
 \usage{
-mle.htrlnorm(x, warning.silent = TRUE)
+mle.htrlnorm(y, warning.silent = TRUE)
 
-dhtrlnorm(xi, phi = 0, meanlog = 0, sdlog = 1)
+dhtrlnorm(x, phi = 0, meanlog = 0, sdlog = 1, a = 0, b = Inf)
 
-qhtrlnorm(p, phi = 0, meanlog = 0, sdlog = 1)
+qhtrlnorm(p, phi = 0, meanlog = 0, sdlog = 1, a = 0, b = Inf)
 
-rhtrlnorm(N, phi = 0, meanlog = 0, sdlog = 1)
+rhtrlnorm(n, phi = 0, meanlog = 0, sdlog = 1, a = 0, b = Inf)
 }
 \arguments{
-\item{x, q}{vector of quantiles.}
+\item{y}{numeric vector containing only finite values.}
 
 \item{warning.silent}{logical; if TRUE suppress all warning messages from
 \code{\link{fitdistr}} during the mle process.}
 
+\item{x}{vector of quantiles.}
+
+\item{phi}{probability of zero.}
+
 \item{meanlog}{mean in the log scale.}
+
+\item{sdlog}{standard deviation in log scale.}
+
+\item{a}{vector of lower bounds.}
+
+\item{b}{vector of upper bounds}
 
 \item{p}{vector of probabilities.}
 
 \item{n}{number of observations.}
-
-\item{sd}{standard deviation in log scale.}
 }
 \description{
 mle parameter estimation, random generation, density and
