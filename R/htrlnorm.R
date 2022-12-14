@@ -17,6 +17,8 @@
 #' @param a lower bounds.
 #' @param b upper bounds.
 #' @param y numeric vector containing only finite values.
+#' @param integer (default TRUE) logical, indicates when to approx the results 
+#' to integer.
 #' @param warning.silent logical; if TRUE suppress all warning messages from 
 #' \code{\link{fitdistr}} during the mle process.
 NULL
@@ -31,7 +33,7 @@ mle.htrlnorm <- function(y, warning.silent=TRUE){
   
   if(!is.vector(y) | any(y<0) | !is.numeric(y)) stop("y must be a numeric vector with all values >= 0.")
   
-  y <- log(y+1)
+  y <- log1p(y)
   y1 <- y[y>0]
   
   n <- length(y)
@@ -98,15 +100,17 @@ dhtrlnorm <- function(x, phi=0, meanlog=0, sdlog=1, a=0, b=Inf){
 #'@rdname htrlnorm
 #'@importFrom truncnorm qtruncnorm
 #'@export
-qhtrlnorm <- function(p, phi=0, meanlog=0, sdlog=1, a=0, b=Inf){
+qhtrlnorm <- function(p, phi=0, meanlog=0, sdlog=1, a=0, b=Inf, integer=TRUE){
   
   #CHECK ARGUMENTS
   if(!is.vector(p) | !is.numeric(p)) stop("p must be a numeric vector")
   if(!is.numeric(phi) | !is.numeric(meanlog) | !is.numeric(sdlog)) stop("phi, meanlog, sdlog must be all number")
-  if(phi<0 || phi>1) stop("phi must be in range [0,1]")
+  if(phi<0 || phi>=1) stop("phi must be in range [0,1)")
   if(sdlog<0) stop("sdlog must be greater than 0")
   if(!is.numeric(a)) stop("a must be numeric")
   if(!is.numeric(b)) stop("b must be numeric")
+  if(!is.logical(integer)) stop("integer must be logical")
+  
   
   ans <- rep(NA_real_,length(p))
   ans[p<=phi] <- 0
@@ -115,9 +119,12 @@ qhtrlnorm <- function(p, phi=0, meanlog=0, sdlog=1, a=0, b=Inf){
   ans[idx]  <- qtruncnorm(p=(p[idx]-phi)/(1-phi), a=a, b=b,
                           mean=meanlog, sd=sdlog)
   
-  ans <- exp(ans) - 1
-  ans[intersect(which(ans>0),which(ans<1))] <- 1
-  ans <- round(ans)
+  ans <- expm1(ans)
+  
+  if(integer){
+    ans[intersect(which(ans>0),which(ans<1))] <- 1
+    ans <- round(ans)
+  }
   
   return(ans)
 }
@@ -125,7 +132,7 @@ qhtrlnorm <- function(p, phi=0, meanlog=0, sdlog=1, a=0, b=Inf){
 #' @rdname htrlnorm
 #' @importFrom truncnorm rtruncnorm
 #' @export
-rhtrlnorm <- function(n, phi=0, meanlog=0, sdlog=1, a=0, b=Inf){
+rhtrlnorm <- function(n, phi=0, meanlog=0, sdlog=1, a=0, b=Inf, integer=TRUE){
   
   if(!is.numeric(n) | !is.numeric(phi) | !is.numeric(meanlog) | !is.numeric(sdlog)) stop("n, phi, meanlog, sdlog must be all number")
   if(round(n)!=n) stop("n must be an integer")
@@ -134,15 +141,19 @@ rhtrlnorm <- function(n, phi=0, meanlog=0, sdlog=1, a=0, b=Inf){
   if(sdlog<0) stop("sdlog must be a positive number")
   if(!is.numeric(a)) stop("a must be numeric")
   if(!is.numeric(b)) stop("b must be numeric")
+  if(!is.logical(integer)) stop("integer must be logical")
   
   ans <- stats::rbinom(n=n, size=1, prob=1-phi)
   m <- length(ans[ans>0])
   ans[ans==1] <- truncnorm::rtruncnorm(n=m, a=a, b=b,
                                        mean=meanlog,sd=sdlog)
   
-  ans <- exp(ans) - 1
-  ans[intersect(which(ans>0),which(ans<1))] <- 1
-  ans <- round(ans)
+  ans <- expm1(ans)
+  
+  if(integer){
+    ans[intersect(which(ans>0),which(ans<1))] <- 1
+    ans <- round(ans)
+  }
   
   return(ans)
 }

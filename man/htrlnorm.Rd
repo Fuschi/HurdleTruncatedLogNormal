@@ -13,9 +13,9 @@ mle.htrlnorm(y, warning.silent = TRUE)
 
 dhtrlnorm(x, phi = 0, meanlog = 0, sdlog = 1, a = 0, b = Inf)
 
-qhtrlnorm(p, phi = 0, meanlog = 0, sdlog = 1, a = 0, b = Inf)
+qhtrlnorm(p, phi = 0, meanlog = 0, sdlog = 1, a = 0, b = Inf, integer = TRUE)
 
-rhtrlnorm(n, phi = 0, meanlog = 0, sdlog = 1, a = 0, b = Inf)
+rhtrlnorm(n, phi = 0, meanlog = 0, sdlog = 1, a = 0, b = Inf, integer = TRUE)
 }
 \arguments{
 \item{y}{numeric vector containing only finite values.}
@@ -36,6 +36,9 @@ rhtrlnorm(n, phi = 0, meanlog = 0, sdlog = 1, a = 0, b = Inf)
 \item{b}{upper bounds.}
 
 \item{p}{vector of probabilities.}
+
+\item{integer}{(default TRUE) logical, indicates when to approx the results
+to integer.}
 
 \item{n}{number of observations.}
 }
