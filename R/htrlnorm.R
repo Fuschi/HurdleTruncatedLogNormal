@@ -105,27 +105,29 @@ qhtrlnorm <- function(p, phi=0, meanlog=0, sdlog=1, a=0, b=Inf, integer=TRUE){
   #CHECK ARGUMENTS
   if(!is.vector(p) | !is.numeric(p)) stop("p must be a numeric vector")
   if(!is.numeric(phi) | !is.numeric(meanlog) | !is.numeric(sdlog)) stop("phi, meanlog, sdlog must be all number")
-  if(phi<0 || phi>=1) stop("phi must be in range [0,1)")
+  if(phi<0 || phi>1) stop("phi must be in range [0,1]")
   if(sdlog<0) stop("sdlog must be greater than 0")
   if(!is.numeric(a)) stop("a must be numeric")
   if(!is.numeric(b)) stop("b must be numeric")
   if(!is.logical(integer)) stop("integer must be logical")
   
-  
-  ans <- rep(NA_real_,length(p))
-  ans[p<=phi] <- 0
-  
-  idx <- is.na(ans)
-  ans[idx]  <- qtruncnorm(p=(p[idx]-phi)/(1-phi), a=a, b=b,
-                          mean=meanlog, sd=sdlog)
-  
-  ans <- expm1(ans)
-  
-  if(integer){
-    ans[intersect(which(ans>0),which(ans<1))] <- 1
-    ans <- round(ans)
+  if(phi==1){
+    ans <- rep(0,length(p))
+  } else {
+    ans <- rep(NA_real_,length(p))
+    ans[p<=phi] <- 0
+    
+    idx <- is.na(ans)
+    ans[idx]  <- qtruncnorm(p=(p[idx]-phi)/(1-phi), a=a, b=b,
+                            mean=meanlog, sd=sdlog)
+    
+    ans <- expm1(ans)
+    
+    if(integer){
+      ans[intersect(which(ans>0),which(ans<1))] <- 1
+      ans <- round(ans)
+    }
   }
-  
   return(ans)
 }
 
