@@ -92,7 +92,7 @@ dhtrlnorm <- function(x, phi=0, meanlog=0, sdlog=1, a=0, b=Inf){
   if(!is.numeric(b)) stop("b must be numeric")
   
   ans <- (1-phi)*dtruncnorm(x,a=a,b=b,mean=meanlog,sd=sdlog)
-  ans[ans==0] <- phi
+  ans[x==0] <- phi
   
   return(ans)
 }
