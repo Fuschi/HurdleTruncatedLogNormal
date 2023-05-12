@@ -59,20 +59,19 @@ mle.htrlnorm <- function(y, warning.silent=TRUE){
   
   
   if(!is.null(param.trnorm.mle)){
-    return(c("phi"    =phi,
-             "meanlog"=as.numeric(param.trnorm.mle$estimate[1]),
-             "sdlog"  =as.numeric(param.trnorm.mle$estimate[2]),
-             "loglik" =loglik,
-             "success"= 1)
-    )
+    estimate <- c("phi"=phi,"meanlog"=as.numeric(param.trnorm.mle$estimate[1]),
+                  "sdlog"  =as.numeric(param.trnorm.mle$estimate[2]))
+    result <- list("estimate"=estimate,
+                   "loglik" =loglik,
+                   "success"= 1)
   } else {
-    return(c("phi"    =phi,
-             "meanlog"=NA,
-             "sdlog"  =NA,
-             "loglik" =NA,
-             "success"=0)
-    )
+    estimate <- c("phi"=phi,"meanlog"=NA,"sdlog"=NA)
+    result <- list("estimate"=estimate,
+                   "loglik" =loglik,
+                   "success"= 1)
   }
+  
+  return(result)
   
 }
 
